@@ -1,0 +1,99 @@
+DELETE test
+
+PUT test
+{
+    "mappings": {
+        "pages": {
+            "properties": {  
+                "title": {"type":"string", "index":"no"},
+                "tag": {
+                    "index_analyzer": "tags-with-payloads",
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "settings": {
+        "analysis": {
+            "analyzer": {
+                "tags-with-payloads": {
+                    "filter": [
+                        "my_delimited_payload_filter"
+                    ],
+                    "tokenizer": "whitespace",
+                    "type": "custom"
+                }
+            },
+            "filter": {
+                "my_delimited_payload_filter": {
+                    "delimiter": "+",
+                    "encoding": "int",
+                    "type": "delimited_payload_filter"
+                }
+            }
+        },
+        "index": {
+            "number_of_replicas": 0,
+            "number_of_shards": 1
+        }
+    }
+}
+
+POST /test/pages/1
+{
+    "title":"page1",
+    "tag": "foo+1 bar+2"
+}
+
+POST /test/pages/2
+{
+    "title":"page2",
+    "tag": "cafe+5 bar+1"
+}
+
+POST /test/pages/3
+{
+    "title":"page3",
+    "tag": "foo+100 bar+3"
+}
+
+POST /test/pages/4
+{
+    "title":"page4",
+    "tag": "foo+5 bar+20"
+}
+
+POST /test/pages/5
+{
+    "title":"page5",
+    "tag": "foo+3"
+}
+
+POST /test/pages/6
+{
+    "title":"page6",
+    "tag": "cafe+2"
+}
+
+POST /test/_refresh
+
+# see http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/modules-advanced-scripting.html
+POST /test/pages/_search
+{
+  "query": {
+    "function_score": {
+      "query": {
+        "terms": {
+          "tag": ["foo", "bar"]
+        }
+      },
+      "script_score": {
+          "script": "score = 0;for (tag in tags_used){termInfo = _index['tag'].get(tag,_PAYLOADS);for (pos in termInfo) {score = score + pos.payloadAsInt(0);}} return score;",
+          "lang" : "groovy",
+          "params": {
+              "tags_used": ["foo", "bar"]
+          }
+      }
+    }
+  }
+}

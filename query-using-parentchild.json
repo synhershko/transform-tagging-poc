@@ -1,0 +1,117 @@
+DELETE /test
+
+PUT /test
+{
+  "settings": {"number_of_replicas": 0,"number_of_shards": 1}, 
+  "mappings": {
+    "tagged-page":{
+        "_parent": {
+           "type": "pages"
+        },
+        "properties": {
+            "name": {
+              "type": "string","index": "not_analyzed"
+            },
+            "score": {
+              "type": "float"
+            }
+        }
+    },
+    "pages": {
+      "properties": {
+        "title":{"type": "string", "index": "no" }
+      }
+    }
+  }
+}
+
+POST /test/pages/1
+{
+    "title":"page1"
+}
+
+POST /test/tagged-page?parent=1
+{
+    "name":"foo", "score":1.0
+}
+
+POST /test/tagged-page?parent=1
+{
+    "name":"bar", "score":5.0
+}
+
+POST /test/pages/2
+{
+    "title":"page2"
+}
+
+POST /test/tagged-page?parent=2
+{"name":"cafe", "score":5.0 }
+
+POST /test/tagged-page?parent=2
+{"name":"bar", "score":1.0}
+
+POST /test/pages/3
+{
+    "title":"page3"
+}
+
+POST /test/tagged-page?parent=3
+{"name":"foo", "score":100.0 }
+
+POST /test/tagged-page?parent=3
+{"name":"bar", "score":3.0}
+
+POST /test/pages/4
+{
+    "title":"page4"
+}
+
+POST /test/tagged-page?parent=4
+{"name":"foo", "score":5.0 }
+
+POST /test/tagged-page?parent=4
+{"name":"bar", "score":20.0}
+
+POST /test/pages/5
+{
+    "title":"page5"
+}
+
+POST /test/tagged-page?parent=5
+{"name":"foo", "score":3.0 }
+
+POST /test/pages/6
+{
+    "title":"page6"
+}
+
+POST /test/tagged-page?parent=6
+{"name":"cafe", "score":2.0}
+
+POST /test/_refresh
+
+POST /test/pages/_search
+{
+  "query": {
+    "top_children" : {
+        "type": "tagged-page",
+        "query": {
+            "function_score": {
+                "query": {
+                    "term": {
+                        "name": "foo"
+                    }
+                },
+                "script_score": {
+                    "lang" : "groovy",
+                    "script": "doc[\"score\"].value"
+                }
+            }
+        },
+        "score" : "max",
+        "factor" : 5,
+        "incremental_factor" : 2
+    }
+  }
+}

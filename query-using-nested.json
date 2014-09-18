@@ -1,0 +1,101 @@
+DELETE test
+
+PUT /test
+{
+  "settings": {"number_of_replicas": 0,"number_of_shards": 1}, 
+  "mappings": {
+    "page": {
+      "properties": {
+        "title":{"type": "string", "index": "no" }, 
+        "tag": {
+          "type": "nested",
+          "fields": {
+            "name": {
+              "type": "string","index": "not_analyzed"
+            },
+            "score": {
+              "type": "float"
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+POST /test/pages/1
+{
+    "title":"page1",
+    "tag":[
+        {"name":"foo", "score":1.0 },
+        {"name":"bar", "score":2.0}
+        ]
+}
+
+POST /test/pages/2
+{
+    "title":"page2",
+    "tag":[
+        {"name":"cafe", "score":5.0 },
+        {"name":"bar", "score":1.0}
+        ]
+}
+
+POST /test/pages/3
+{
+    "title":"page3",
+    "tag":[
+        {"name":"foo", "score":100.0 },
+        {"name":"bar", "score":3.0}
+        ]
+}
+
+POST /test/pages/4
+{
+    "title":"page4",
+    "tag":[
+        {"name":"foo", "score":5.0 },
+        {"name":"bar", "score":20.0}
+        ]
+}
+
+POST /test/pages/5
+{
+    "title":"page5",
+    "tag":[
+        {"name":"foo", "score":3.0 }
+        ]
+}
+
+POST /test/pages/6
+{
+    "title":"page6",
+    "tag":[
+        {"name":"cafe", "score":2.0}
+        ]
+}
+
+POST /test/_refresh
+
+POST /test/pages/_search
+{
+  "query": {
+    "nested": {
+      "path": "tag",
+      "score_mode": "sum",
+      "query": {
+        "function_score": {
+          "query": {
+            "term": {
+              "tag.name": "foo"
+            }
+          },
+          "script_score": {
+            "lang" : "groovy",
+            "script": "doc[\"score\"].value"
+          }
+        }
+      }
+    }
+  }
+}
