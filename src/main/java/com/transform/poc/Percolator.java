@@ -2,8 +2,6 @@ package com.transform.poc;
 
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.ImmutableSettings;
-import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.node.Node;
 
@@ -11,8 +9,6 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
-import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
-import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 
 /**
