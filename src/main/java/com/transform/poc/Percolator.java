@@ -4,6 +4,7 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.node.Node;
 
 import java.io.IOException;
@@ -96,7 +97,7 @@ public abstract class Percolator implements Tagger {
     }
 
     // Percolation is explained here http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-percolate.html
-    protected void addPercolationQuery(String name, XContentBuilder query) throws IOException {
+    protected void addPercolationQuery(String name, QueryBuilder query) throws IOException {
         //Index the query = register it in the percolator
         client.prepareIndex("tagging-index", ".percolator", name)
                 .setSource(jsonBuilder()

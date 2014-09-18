@@ -24,6 +24,7 @@ public class TitlePercolator extends Percolator {
         for (String keyword : keywords) {
             qb.should(matchQuery("title", keyword));
         }
+        addPercolationQuery(tagName, qb);
     }
 
     public Collection<TagMatch> getTags(Document doc) throws IOException {
