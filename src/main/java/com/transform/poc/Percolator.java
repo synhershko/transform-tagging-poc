@@ -1,21 +1,12 @@
 package com.transform.poc;
 
-import org.elasticsearch.action.percolate.PercolateResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.ImmutableSettings;
-import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.node.Node;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
@@ -37,7 +28,7 @@ public abstract class Percolator implements Tagger {
         }
 
         final long start = System.currentTimeMillis();
-        final String percolatorId = hostname + "_" + new DateTime(start).toString(DateTimeFormat.forPattern("yyyyMMddHHmm"));
+        final String percolatorId = hostname; //+ "_" + new DateTime(start).toString(DateTimeFormat.forPattern("yyyyMMddHHmm"));
         node = nodeBuilder().clusterName("tagging")
                 .settings(ImmutableSettings.settingsBuilder()
                         .put("node.name", percolatorId)
