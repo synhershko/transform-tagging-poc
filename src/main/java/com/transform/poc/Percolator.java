@@ -55,17 +55,35 @@ public class Percolator implements Closeable {
                         "    \"order\" : 0,\n" +
                         "    \"settings\" : {\n" +
                         "        \"number_of_shards\" : 1,\n" +
-                        "        \"number_of_replicas\" : 0\n" +
+                        "        \"number_of_replicas\" : 0,\n" +
+                        "        \"analysis\": {\n" +
+                        "           \"filter\":{\n"+
+                        "               \"english_stemmer\": {\n" +
+                        "               \"type\":       \"stemmer\",\n" +
+                        "               \"language\":   \"english\"\n" +
+                        "        },\n" +
+                        "        \"english_possessive_stemmer\": {\n" +
+                        "          \"type\":       \"stemmer\",\n" +
+                        "          \"language\":   \"possessive_english\"\n" +
+                        "        }},\n" +
+                                "            \"analyzer\": {\n" +
+                                "                \"english-html\": {\n" +
+                        "                            \"char_filter\":[\"html_strip\"],\n" +
+                                "                    \"tokenizer\":      \"standard\",\n" +
+                                "                    \"filter\": [\"english_possessive_stemmer\",\"lowercase\",\"english_stemmer\"]\n" +
+                                "                }\n" +
+                                "            }\n" +
+                                "        }\n" +
                         "    },\n" +
                         "    \"mappings\" : {\n" +
                         "        \"nutch-document\" : {\n" +
                         "            \"_all\" : { \"enabled\" : false },\n" +
                         "            \"properties\": {\n" +
                         "                \"title\": {\n" +
-                        "                  \"type\": \"string\"\n" +
+                        "                  \"type\": \"string\", \"analyzer\":\"english-html\"\n" +
                         "                },\n" +
                         "                \"content\": {\n" +
-                        "                  \"type\": \"string\"\n" +
+                        "                  \"type\": \"string\", \"analyzer\":\"english-html\"\n" +
                         "                }\n" +
                         "             }\n" +
                         "         }\n" +
@@ -119,7 +137,6 @@ public class Percolator implements Closeable {
         PercolateResponse response = client.preparePercolate()
                 .setIndices("tagging-index")
                 .setDocumentType("nutch-document")
-//                .setScore(true).setSortByScore(true)
                 .setSource(docBuilder).execute().actionGet();
 
         //Iterate over the results
