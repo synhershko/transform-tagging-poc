@@ -1,15 +1,10 @@
 package com.transform;
 
-import com.transform.poc.ContentPercolator;
-import com.transform.poc.Document;
-import com.transform.poc.Percolator;
-import com.transform.poc.TagMatch;
+import com.transform.poc.*;
 import org.jsoup.Jsoup;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Scanner;
+import java.util.*;
 
 /**
  * Hello world!
@@ -18,16 +13,19 @@ import java.util.Scanner;
 public class App 
 {
     public static void main( String[] args ) throws IOException {
+        List<TagMapping> _tags = new ArrayList<TagMapping>();
+        _tags.add(new TagMapping("export", Arrays.asList("elling overseas", "foreign trade")));
+        _tags.add(new TagMapping("export-market-intelligence", Arrays.asList("competition", "competitors", "research")));
+        _tags.add(new TagMapping("export-develop", Arrays.asList("overseas", "UKTI", "partner", "consultant")));
+        _tags.add(new TagMapping("export-distribute", Arrays.asList("customs", "supplier", "logistics", "transport")));
+        _tags.add(new TagMapping("export-show", Arrays.asList("exhibition", "advertising", "promotion")));
+        _tags.add(new TagMapping("export-culture", Arrays.asList("language", "custom", "polite", "manners")));
+        _tags.add(new TagMapping("export-grow", Arrays.asList("grow", "overseas", "customers", "expansion", "supply")));
+
         Percolator percolator = new ContentPercolator();
-
-        percolator.registerQuery("export", Arrays.asList("elling overseas", "foreign trade"));
-        percolator.registerQuery("export-market-intelligence", Arrays.asList("competition", "competitors", "research"));
-        percolator.registerQuery("export-develop", Arrays.asList("overseas", "UKTI", "partner", "consultant"));
-        percolator.registerQuery("export-distribute", Arrays.asList("customs", "supplier", "logistics", "transport"));
-        percolator.registerQuery("export-show", Arrays.asList("exhibition", "advertising", "promotion"));
-        percolator.registerQuery("export-culture", Arrays.asList("language", "custom", "polite", "manners"));
-        percolator.registerQuery("export-grow", Arrays.asList("grow", "overseas", "customers", "expansion", "supply"));
-
+        for (TagMapping tag : _tags) {
+            percolator.registerTag(tag.getTagName(), tag.getKeywords());
+        }
         percolator.flush();
 
         Scanner in = new Scanner(System.in);

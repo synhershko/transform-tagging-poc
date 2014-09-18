@@ -2,6 +2,7 @@ package com.transform.poc;
 
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.ImmutableSettings;
+import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.node.Node;
 
@@ -19,6 +20,7 @@ import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 public abstract class Percolator implements Tagger {
     private Node node;
     protected Client client;
+    private float taggerScore = 1.0f;
 
     protected Percolator(){
         String hostname = "percolator";
@@ -94,18 +96,12 @@ public abstract class Percolator implements Tagger {
     }
 
     // Percolation is explained here http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-percolate.html
-    public void registerQuery(String tagName, Iterable<String> keywords) throws IOException {
-        //This is the query we're registering in the percolator
-        final BoolQueryBuilder qb = boolQuery();
-        for (String keyword : keywords) {
-            qb.should(matchQuery("content", keyword));
-        }
-
+    protected void addPercolationQuery(String name, XContentBuilder query) throws IOException {
         //Index the query = register it in the percolator
-        client.prepareIndex("tagging-index", ".percolator", tagName)
+        client.prepareIndex("tagging-index", ".percolator", name)
                 .setSource(jsonBuilder()
                         .startObject()
-                        .field("query", qb) // Register the query
+                        .field("query", query) // Register the query
                         .endObject())
                 .execute().actionGet();
     }
@@ -119,5 +115,13 @@ public abstract class Percolator implements Tagger {
     public void close() throws IOException {
         client.close();
         node.close();
+    }
+
+    public float getTaggerScore() {
+        return taggerScore;
+    }
+
+    public void setTaggerScore(float taggerScore) {
+        this.taggerScore = taggerScore;
     }
 }

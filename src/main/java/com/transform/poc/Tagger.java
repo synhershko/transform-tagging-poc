@@ -9,5 +9,5 @@ import java.util.Collection;
  */
 public interface Tagger extends Closeable {
     public Collection<TagMatch> getTags(Document doc) throws IOException;
-    public void registerQuery(String tagName, Iterable<String> keywords) throws IOException;
+    public void registerTag(String tagName, Iterable<String> keywords) throws IOException;
 }
