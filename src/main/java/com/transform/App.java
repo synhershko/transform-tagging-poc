@@ -1,5 +1,6 @@
 package com.transform;
 
+import com.transform.poc.ContentPercolator;
 import com.transform.poc.Document;
 import com.transform.poc.Percolator;
 import com.transform.poc.TagMatch;
@@ -17,7 +18,7 @@ import java.util.Scanner;
 public class App 
 {
     public static void main( String[] args ) throws IOException {
-        Percolator percolator = new Percolator();
+        Percolator percolator = new ContentPercolator();
 
         percolator.registerQuery("export", Arrays.asList("elling overseas", "foreign trade"));
         percolator.registerQuery("export-market-intelligence", Arrays.asList("competition", "competitors", "research"));

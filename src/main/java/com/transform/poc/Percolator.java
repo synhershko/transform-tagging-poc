@@ -25,11 +25,11 @@ import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 /**
  * Created by synhershko on 9/17/14.
  */
-public class Percolator implements Closeable {
+public abstract class Percolator implements Tagger {
     private Node node;
-    private Client client;
+    protected Client client;
 
-    public Percolator(){
+    protected Percolator(){
         String hostname = "percolator";
         try {
             hostname = java.net.InetAddress.getLocalHost().getHostName();
@@ -123,33 +123,6 @@ public class Percolator implements Closeable {
         client.admin().indices().prepareFlush("tagging-index").execute().actionGet();
         client.admin().indices().prepareRefresh("tagging-index").execute().actionGet();
     }
-
-    public Collection<TagMatch> getTags(Document doc) throws IOException {
-        //Build a document to check against the percolator
-        XContentBuilder docBuilder = XContentFactory.jsonBuilder().startObject();
-        docBuilder.field("doc").startObject(); //This is needed to designate the document
-        docBuilder.field("title", doc.getTitle());
-        docBuilder.field("content", doc.getContent());
-        docBuilder.endObject(); //End of the doc field
-        docBuilder.endObject(); //End of the JSON root object
-
-        // Percolate
-        PercolateResponse response = client.preparePercolate()
-                .setIndices("tagging-index")
-                .setDocumentType("nutch-document")
-                .setSource(docBuilder).execute().actionGet();
-
-        //Iterate over the results
-        final List<TagMatch> ret = new ArrayList<TagMatch>();
-        for(PercolateResponse.Match match : response) {
-            // match.getScore() now contains the score, e.g. tag confidence
-            // Obviously, this "confidence" is tightly coupled with the actual
-            // query and index mapping used
-            ret.add(new TagMatch(match.getId().string(), match.getScore()));
-        }
-        return ret;
-    }
-
 
     @Override
     public void close() throws IOException {
