@@ -83,7 +83,7 @@ public abstract class Percolator implements Tagger {
                         "                  \"type\": \"string\", \"analyzer\":\"english-html\"\n" +
                         "                },\n" +
                         "                \"content\": {\n" +
-                        "                  \"type\": \"string\", \"analyzer\":\"english-html\"\n" +
+                        "                  \"type\": \"string\", \"position_offset_gap\": 10000, \"analyzer\":\"english-html\"\n" +
                         "                }\n" +
                         "             }\n" +
                         "         }\n" +
